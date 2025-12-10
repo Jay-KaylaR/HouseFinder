@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Rental & Buying Guides - HouseFinder Mombasa{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <h2 class="mb-3">Rental & Buying Guides</h2>
+        <p class="text-muted mb-4">
+            Practical tips to help you rent or buy safely and confidently in Mombasa. Use these guides together with
+            verified listings and manager profiles on HouseFinder Mombasa.
+        </p>
+
+        <div class="accordion" id="guidesAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        1. Renting Safely in Mombasa
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                     data-bs-parent="#guidesAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Always view the property in person before sending any money.</li>
+                            <li>Confirm the identity of the manager or agent and ask for written agreements.</li>
+                            <li>Use official channels for payments and keep all receipts and messages safely.</li>
+                            <li>Check water, power, security, and accessibility before you commit.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mt-2">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        2. Comparing Rent vs. Buying
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                     data-bs-parent="#guidesAccordion">
+                    <div class="accordion-body">
+                        <p class="mb-2">
+                            The right choice depends on your long-term plans, savings, and how long you want to stay in the area.
+                        </p>
+                        <ul class="mb-0">
+                            <li>Renting offers flexibility and lower upfront costs.</li>
+                            <li>Buying can build long-term value but needs more planning and due diligence.</li>
+                            <li>Consider total monthly cost, not just rent or mortgage (utilities, service charge, etc.).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mt-2">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        3. Avoiding Common Property Scams
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                     data-bs-parent="#guidesAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Be careful of offers that look too cheap for prime locations.</li>
+                            <li>Do not send deposits to personal numbers without proper documentation.</li>
+                            <li>Insist on viewing and signing written agreements before paying large amounts.</li>
+                            <li>Use trusted platforms and verified managers where possible.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mt-2">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        4. Preparing Your Documents
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                     data-bs-parent="#guidesAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Have your identification, contacts, and references ready when applying.</li>
+                            <li>Keep copies of signed tenancy agreements and payment records.</li>
+                            <li>Clarify who is responsible for repairs, utilities, and service charges in writing.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>How HouseFinder Helps</h6>
+            </div>
+            <div class="card-body small">
+                <p class="mb-2">HouseFinder Mombasa is built to connect renters and buyers with verified property managers.</p>
+                <ul class="mb-0">
+                    <li>Verified manager accounts and profile information.</li>
+                    <li>Mapped property locations for better decision making.</li>
+                    <li>Clear listing details for price, status, and features.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-book-reader me-2 text-primary"></i>Next Steps</h6>
+            </div>
+            <div class="card-body small">
+                <p class="mb-2">Ready to start?</p>
+                <a href="{% url 'main:listings' %}" class="btn btn-primary w-100 mb-2">
+                    Browse Properties
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary w-100">
+                        Create an Account
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

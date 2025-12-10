@@ -1,0 +1,6 @@
+django==5.1
+cloudinary
+django-cloudinary-storage
+django-mpesa
+python-decouple
+pillow

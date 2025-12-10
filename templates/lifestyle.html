@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Lifestyle & Decor - HouseFinder Mombasa{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <h2 class="mb-3">Lifestyle & Home Ideas</h2>
+        <p class="text-muted mb-4">
+            Explore ideas to make your new house feel like home, from coastal-inspired decor to smart space usage in
+            apartments and bedsitters.
+        </p>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-umbrella-beach me-2 text-primary"></i>Coastal-Themed Decor
+                        </h5>
+                        <p class="card-text small">
+                            Use light colours, natural materials, and simple decor to reflect Mombasa’s coastal feel
+                            without spending too much.
+                        </p>
+                        <ul class="small mb-0">
+                            <li>Light curtains to maximise natural light.</li>
+                            <li>Simple art and wall hangings instead of heavy fixtures.</li>
+                            <li>Neutral furniture with a few coloured cushions or throws.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-compress-arrows-alt me-2 text-primary"></i>Making Small Spaces Work
+                        </h5>
+                        <p class="card-text small">
+                            Many city apartments and bedsitters are compact. Smart choices can make them feel larger.
+                        </p>
+                        <ul class="small mb-0">
+                            <li>Use multi-purpose furniture like sofa beds or storage ottomans.</li>
+                            <li>Keep walkways clear and avoid overfilling the room.</li>
+                            <li>Use vertical shelves for books, decor, or kitchen storage.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-leaf me-2 text-success"></i>Comfort, Safety, and Community
+                </h5>
+                <p class="small mb-2">
+                    Lifestyle is more than just furniture. The right neighbourhood and building affect your daily life.
+                </p>
+                <ul class="small mb-0">
+                    <li>Check noise levels at different times of day.</li>
+                    <li>Consider access to public transport, shops, schools, or workplaces.</li>
+                    <li>Ask about security, lighting, and how visitors are handled.</li>
+                    <li>Think about ventilation and cooling, especially in hotter months.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-heart me-2 text-primary"></i>Featured Neighbourhoods</h6>
+            </div>
+            <div class="card-body small">
+                <ul class="mb-0">
+                    <li><strong>Nyali:</strong> Popular for apartments near the beach and malls.</li>
+                    <li><strong>Bamburi:</strong> Mix of budget and mid-range housing with good access roads.</li>
+                    <li><strong>Mombasa CBD:</strong> Suitable if you want to be close to offices and services.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-home me-2 text-primary"></i>Plan Your Next Move</h6>
+            </div>
+            <div class="card-body small">
+                <p class="mb-2">When you are ready to move, use HouseFinder to shortlist and compare properties.</p>
+                <a href="{% url 'main:listings' %}" class="btn btn-primary w-100 mb-2">
+                    Browse Available Properties
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary w-100">
+                        Create a Free Account
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Home - HouseFinder Mombasa{% endblock %}
+
+{% block content %}
+<section class="hero-section rounded-3 p-5 mb-4 text-white shadow-sm">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold mb-3">
+                Find Your Next Home in Mombasa
+            </h1>
+            <p class="lead mb-4">
+                Discover verified rentals and homes for sale across Nyali, Bamburi, CBD, and beyond — managed by trusted property managers.
+            </p>
+            <form method="get" action="{% url 'main:listings' %}" class="row g-2">
+                <div class="col-md-8">
+                    <input type="text"
+                           name="q"
+                           class="form-control form-control-lg"
+                           placeholder="Search by area, e.g. Nyali, Bamburi, CBD">
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button class="btn btn-light btn-lg fw-bold" type="submit">
+                        <i class="fas fa-search me-2"></i>Search Properties
+                    </button>
+                </div>
+            </form>
+            <div class="mt-3 text-light small">
+                <i class="fas fa-check-circle me-1"></i>Verified managers
+                <span class="ms-3"><i class="fas fa-check-circle me-1"></i>Mapped locations</span>
+            </div>
+        </div>
+        <div class="col-lg-5 text-center mt-4 mt-lg-0">
+            <i class="fas fa-city fa-6x mb-3"></i>
+            <p class="mb-0">
+                <span class="badge bg-light text-dark me-2">For Rent</span>
+                <span class="badge bg-outline-light border border-light text-light">For Sale</span>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Featured Properties</h3>
+        <a href="{% url 'main:listings' %}" class="btn btn-sm btn-outline-primary">
+            View all listings
+        </a>
+    </div>
+    <div class="row">
+        {% if featured_properties %}
+            {% for property in featured_properties %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    {% if property.cover_image %}
+                    <img src="{{ property.cover_image.url }}"
+                         class="card-img-top"
+                         style="height: 220px; object-fit: cover;"
+                         alt="{{ property.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h5 class="card-title mb-0">{{ property.title|truncatechars:40 }}</h5>
+                            <span class="badge bg-primary">{{ property.get_status_display }}</span>
+                        </div>
+                        <p class="text-primary fw-bold mb-1">
+                            KSh {{ property.price|floatformat:0 }}
+                        </p>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ property.location }}
+                        </p>
+                        <p class="text-muted small mb-3">
+                            {{ property.bedrooms }} BR · {{ property.bathrooms }} BA · {{ property.views_count }} views
+                        </p>
+                        <a href="{% url 'properties:detail' property.slug %}"
+                           class="btn btn-outline-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No featured properties available yet. Check back soon or browse all listings.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-check me-2 text-primary"></i>Verified Managers</h5>
+                    <p class="card-text small">
+                        All property managers are verified with ID and KRA PIN, helping you avoid common rental scams.
+                    </p>
+                    <a href="{% url 'accounts:register' %}" class="text-primary small">
+                        Create an account to get started →
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Map-based search</h5>
+                    <p class="card-text small">
+                        Every listing includes latitude and longitude, allowing you to view exact locations on Google Maps.
+                    </p>
+                    <span class="badge bg-light text-muted border">Mombasa · Nyali · Bamburi · CBD</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-wallet me-2 text-primary"></i>M-Pesa friendly</h5>
+                    <p class="card-text small">
+                        Built with M-Pesa integration in mind so managers can track commissions securely and transparently.
+                    </p>
+                    <span class="badge bg-success">Kenya-first experience</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

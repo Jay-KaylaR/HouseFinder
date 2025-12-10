@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Profile - HouseFinder Mombasa{% endblock %}
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="Profile" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
+                {% endif %}
+                <h4 class="fw-bold">{{ user.username }}</h4>
+                <span class="badge bg-{% if user.user_type == 'renter' %}info elif user.user_type == 'manager' %}success else bg-danger {% endif %} fs-6">
+                    {{ user.get_user_type_display }}
+                </span>
+                <p class="text-muted mt-2">{{ user.email }}</p>
+                {% if user.phone %}
+                    <p><i class="fas fa-phone me-2"></i>{{ user.phone }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.bio.label_tag }}
+                        {{ form.bio }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Profile Image</label>
+                        {{ form.profile_image }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Update Profile
+                    </button>
+                    <a href="{% url 'main:home' %}" class="btn btn-secondary ms-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

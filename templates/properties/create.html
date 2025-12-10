@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Add Property - HouseFinder Mombasa{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Property
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Fill in the details below to list a new property. Make sure the location and price are accurate to
+                    attract the right tenants or buyers.
+                </p>
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Save Property
+                    </button>
+                    <a href="{% url 'properties:my_properties' %}" class="btn btn-secondary ms-2">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+            <div class="card-footer bg-light small text-muted">
+                Your listing will be reviewed by an administrator before it appears in public search results.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

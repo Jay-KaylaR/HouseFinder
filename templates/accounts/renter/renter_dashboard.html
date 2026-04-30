@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}House Seeker Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="fw-bold h3">House Seeker Dashboard</h1>
+    <p class="text-muted mb-0">
+      Welcome back, {{ request.user.first_name }} {{ request.user.last_name }}
+    </p>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="row g-4 mb-4">
+    <!-- Search properties -->
+    <div class="col-12 col-md-3">
+      <a href="{% url 'properties:listings' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body text-center">
+            <div class="rounded-3 bg-primary-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width:3rem;height:3rem;">
+              <i class="fas fa-search text-primary"></i>
+            </div>
+            <h6 class="fw-semibold text-dark mb-1">Search properties</h6>
+            <small class="text-muted">Find your next home</small>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Saved properties -->
+    <div class="col-12 col-md-3">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body text-center">
+          <div class="rounded-3 bg-danger-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width:3rem;height:3rem;">
+            <i class="fas fa-heart text-danger"></i>
+          </div>
+          <h6 class="fw-semibold text-dark mb-1">Saved properties</h6>
+          <p class="display-6 fw-bold mb-0">
+            {{ saved_properties|length|default:0 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active chats -->
+    <div class="col-12 col-md-3">
+      <a href="{% url 'main:home' %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body text-center">
+            <div class="rounded-3 bg-info-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width:3rem;height:3rem;">
+              <i class="fas fa-comments text-info"></i>
+            </div>
+            <h6 class="fw-semibold text-dark mb-1">Active chats</h6>
+            <div class="d-flex justify-content-center align-items-center gap-2">
+              <span class="h4 fw-bold mb-0">{{ active_chats|default:0 }}</span>
+              {% if unread_messages|default:0 > 0 %}
+                <span class="badge bg-danger">{{ unread_messages }} new</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Scheduled visits -->
+    <div class="col-12 col-md-3">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body text-center">
+          <div class="rounded-3 bg-success-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width:3rem;height:3rem;">
+            <i class="fas fa-calendar text-success"></i>
+          </div>
+          <h6 class="fw-semibold text-dark mb-1">Scheduled visits</h6>
+          <p class="display-6 fw-bold mb-0">
+            {{ scheduled_visits|default:0 }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved properties + conversations -->
+  <div class="row g-4">
+    <!-- Saved properties -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-semibold">Saved properties</h5>
+          <a href="{% url 'properties:listings' %}" class="btn btn-sm btn-outline-primary">Browse more</a>
+        </div>
+        <div class="card-body">
+          {% if saved_properties %}
+            {% for prop in saved_properties|slice:":3" %}
+              <div class="d-flex align-items-center mb-3 p-2 rounded-3 border hover-shadow-sm">
+                <img
+                  src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=160&h=110&q=80"
+                  alt="{{ prop.title }}"
+                  class="rounded-3 me-3"
+                  style="width:100px;height:70px;object-fit:cover;"
+                >
+                <div class="flex-grow-1">
+                  <a href="{% url 'properties:detail' prop.pk %}" class="text-decoration-none">
+                    <h6 class="mb-1 text-dark">{{ prop.title|truncatechars:40 }}</h6>
+                  </a>
+                  <small class="text-muted d-block">
+                    {{ prop.location }} • KSh {{ prop.price|floatformat:0|intcomma }}/month
+                  </small>
+                  <small class="text-muted">
+                    {{ prop.bedrooms }} bed • {{ prop.bathrooms }} bath
+                  </small>
+                </div>
+                <div class="ms-2 d-flex flex-column gap-2">
+                  <a href="{% url 'properties:detail' prop.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
+                  <form method="post" action="{% url 'accounts:remove_saved' prop.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-link text-danger">Remove</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+            {% if saved_properties|length > 3 %}
+              <p class="text-muted small mt-3">
+                and {{ saved_properties|length|add:"-3" }} more saved homes…
+              </p>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-heart fa-2x text-muted mb-3"></i>
+              <p class="text-muted mb-2">You have not saved any homes yet.</p>
+              <a href="{% url 'properties:listings' %}" class="btn btn-primary btn-sm">Start searching</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent conversations -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-semibold">Recent conversations</h5>
+          <a href="{% url 'main:home' %}" class="btn btn-sm btn-outline-primary">View all</a>
+        </div>
+        <div class="card-body">
+          {% if conversations %}
+            {% for conv in conversations|slice:":4" %}
+              {% if conv.property %}
+                <a href="{% url 'properties:detail' conv.property.pk %}" class="text-decoration-none">
+              {% else %}
+                <a href="#" class="text-decoration-none">
+              {% endif %}
+                <div class="d-flex align-items-start mb-3 p-2 rounded-3 hover-bg-light">
+                  <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                    <span class="small">
+                      {{ conv.other_party_name|first|upper }}
+                    </span>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between">
+                      <strong class="text-dark small">{{ conv.other_party_name|truncatechars:22 }}</strong>
+                      <small class="text-muted">{{ conv.last_message_at|date:"H:i" }}</small>
+                    </div>
+                    <small class="text-muted d-block">
+                      {{ conv.last_message_preview|truncatechars:50 }}
+                    </small>
+                    {% if conv.property %}
+                      <small class="text-muted">Regarding: {{ conv.property.title|truncatechars:25 }}</small>
+                    {% endif %}
+                  </div>
+                  {% if conv.unread_count > 0 %}
+                    <span class="badge bg-danger ms-2">{{ conv.unread_count }}</span>
+                  {% endif %}
+                </div>
+              </a>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-comments fa-2x text-muted mb-3"></i>
+              <p class="text-muted mb-0">No conversations yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick search shortcuts -->
+  <div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-white border-0">
+      <h5 class="mb-0 fw-semibold">Quick search</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <a href="{% url 'properties:listings' %}?area=Nyali" class="btn btn-outline-secondary w-100 text-start">
+            <i class="fas fa-map-marker-alt me-2 text-primary"></i>Nyali homes
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'properties:listings' %}?area=Tudor" class="btn btn-outline-secondary w-100 text-start">
+            <i class="fas fa-map-marker-alt me-2 text-primary"></i>Tudor homes
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'properties:listings' %}?max_rent=30000" class="btn btn-outline-secondary w-100 text-start">
+            <i class="fas fa-wallet me-2 text-primary"></i>Under KSh 30K
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'properties:listings' %}?furnished=1" class="btn btn-outline-secondary w-100 text-start">
+            <i class="fas fa-couch me-2 text-primary"></i>Furnished only
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hover-shadow-sm:hover { box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08); }
+  .hover-bg-light:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}

@@ -1,24 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth import get_user_model
 from properties.models import Property, PropertyImage, Inquiry, Category
 from managerial.models import Commission
-from accounts.models import User
-
-User = get_user_model()
-
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'user_type', 'is_staff', 'date_joined', 'verified')
-    list_filter = ('user_type', 'is_staff', 'is_superuser', 'verified')
-    fieldsets = UserAdmin.fieldsets + (
-        ('HouseFinder Info', {
-            'fields': ('user_type', 'phone', 'national_id', 'kra_pin', 'verified', 'profile_image', 'bio')
-        }),
-    )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('HouseFinder Info', {'fields': ('user_type', 'phone')}),
-    )
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -31,13 +13,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('title', 'manager', 'price', 'status', 'category', 'approved', 'views_count', 'created_at')
-    list_filter = ('status', 'category', 'approved', 'created_at')
+    list_display = ('title', 'manager', 'price', 'listing_status', 'category', 'approved', 'views_count', 'created_at')
+    list_filter = ('listing_status', 'category', 'approved', 'created_at')
     search_fields = ('title', 'description', 'location')
     readonly_fields = ('views_count', 'created_at', 'slug')
     fieldsets = (
         ('Property Details', {
-            'fields': ('title', 'slug', 'description', 'price', 'status', 'category', 'location', 'lat', 'lng')
+            'fields': ('title', 'slug', 'description', 'price', 'workflow_status', 'category', 'location', 'lat', 'lng')
         }),
         ('Features', {
             'fields': ('bedrooms', 'bathrooms', 'cover_image', 'is_featured')

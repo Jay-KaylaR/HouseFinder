@@ -5,8 +5,11 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from .models import Property, PropertyImage, Inquiry, Category
+from .models import Property, PropertyImage, Inquiry, Category, SavedProperty  # ✅ Add SavedProperty model
 from .forms import PropertyForm
+# from django.http import Http404
+# from django.db import transaction
+
 
 User = get_user_model()
 
@@ -14,7 +17,7 @@ User = get_user_model()
 def home_view(request):
     '''Homepage: show featured properties'''
     # capture approved/featured properties
-    properties = Property.objects.filter(approved=True, is_featured=True)[:6]
+    properties = Property.objects.filter(workflow_status__in=['approved', 'available'], is_featured=True)[:6]
     # search functionality
     query = request.GET.get('q')
     if query:
@@ -36,7 +39,7 @@ def home_view(request):
 
 def listings_view(request):
     '''Public property listings with filters'''
-    properties = Property.objects.filter(approved=True)
+    properties = Property.objects.filter(workflow_status__in=['approved', 'available'])
     query = request.GET.get('q')
     if query:
         properties = properties.filter(
@@ -50,7 +53,7 @@ def listings_view(request):
     max_price = request.GET.get('max_price')
     
     if status:
-        properties = properties.filter(status=status)
+        properties = properties.filter(listing_status=status)
     if category:
         properties = properties.filter(category__name__icontains=category)
     if min_price:
@@ -102,19 +105,40 @@ def my_properties_view(request):
     return render(request, 'properties/my_properties.html', {
         'properties': my_properties
     })
-
-def property_detail_view(request, slug):
+ 
+def property_detail_view(request, pk=None, slug=None):
     '''Public property detail page'''
-    property = get_object_or_404(Property, slug=slug, approved=True)
+    """Handle both ID and slug from URL"""
+    if slug:
+        property = get_object_or_404(Property, slug=slug)
+         # Try to fetch by slug first, then fallback to ID if slug not found
+    elif pk:
+        property = get_object_or_404(Property, pk=pk)
     
-    # Increment views
-    property.views_count += 1
-    property.save(update_fields=['views_count'])
-    
-    # Check if user can contact (for inquiry form)
-    can_contact = True
-    if not request.user.is_authenticated:
-        can_contact = False
+    else:
+        raise Http404("No property specified")
+   
+   
+
+    # Only allow public viewing if approved; allow owners/managers/admins to preview
+    user_can_preview = (
+        request.user.is_authenticated and (
+            request.user == property.manager or
+            getattr(request.user, 'is_superuser', False) or
+            getattr(request.user, 'is_manager', lambda: False)()
+        )
+    )
+
+    if not property.approved and not user_can_preview:
+        # Keep public behavior (404) for non-authorized viewers
+        raise Http404("No Property matches the given query.")
+
+    # Increment views only for public viewers (not previews by owner/manager)
+    if property.approved:
+        property.views_count += 1
+        property.save(update_fields=['views_count'])
+
+    can_contact = request.user.is_authenticated
     images = property.images.all()
 
     return render(request, 'properties/detail.html', {
@@ -168,7 +192,7 @@ def delete_property_view(request, pk):
 @login_required
 def send_inquiry_view(request, pk):
     '''Renters send inquiries to managers'''
-    property = get_object_or_404(Property, pk=pk, approved=True)
+    property = get_object_or_404(Property, pk=pk, workflow_status__in=['approved', 'available'])
     
     if request.method == "POST":
         message = request.POST.get('message')
@@ -181,3 +205,47 @@ def send_inquiry_view(request, pk):
         return redirect("properties:detail", slug=property.slug)
     
     return render(request, 'properties/inquiry.html', {'property': property})
+
+@login_required
+def toggle_save(request, property_id):
+    """Toggle property to/from saved list"""
+    property = get_object_or_404(Property, id=property_id)
+    
+    saved_prop, created = SavedProperty.objects.get_or_create(
+        user=request.user,
+        property=property
+    )
+    
+    if not created:
+        saved_prop.delete()
+        messages.info(request, f'Removed "{property.title}" from saved')
+    else:
+        messages.success(request, f'Added "{property.title}" to saved')
+    
+    return redirect(request.META.get('HTTP_REFERER', 'properties:listing'))
+
+@login_required
+def contact_manager(request, property_id):
+    """Send automated message to property manager"""
+    property = get_object_or_404(Property, id=property_id)
+    manager = property.manager
+    
+    # ✅ AUTOMATIC MESSAGE
+    message = f"Hi {manager.first_name}, I'm interested in '{property.title}' at {property.location}. Price: KSh {property.price:,}/mo"
+    
+    # Save to chat/conversation (if you have messaging app)
+    # Or send email/SMS here
+    
+    messages.success(request, f'Message sent to {manager.first_name}! They will contact you soon.')
+    
+    # Redirect back to listing or property detail
+    return redirect('properties:detail', slug=property.slug)
+
+
+
+    ontext = {
+        'properties': properties,
+        # ✅ Pass saved properties for current user
+        'saved_properties': request.user.saved_properties.all() if request.user.is_authenticated else []
+    }
+    return render(request, 'properties/property_list.html', context)

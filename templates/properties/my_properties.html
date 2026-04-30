@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}My Properties - House Hunting Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="h2 fw-bold mb-2">My Properties</h1>
+      <p class="text-muted mb-0">Manage your listings ({{ properties.paginator.count }} total)</p>
+    </div>
+    <a href="{% url 'properties:create' %}" class="btn btn-primary btn-lg">
+      <i class="fas fa-plus me-2"></i>Add New Property
+    </a>
+  </div>
+
+  <!-- Status Summary -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-3">
+      <div class="card border-0 bg-light text-center py-4">
+        <h3 class="text-success">{{ properties|length }}</h3>
+        <small class="text-muted">Active Listings</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Properties Grid -->
+  {% if properties %}
+  <div class="row g-4">
+    {% for property in properties %}
+    <div class="col-xl-4 col-lg-6">
+      <div class="card border-0 shadow-sm h-100 hover-raise">
+        <div class="position-relative overflow-hidden">
+          <img src="{{ property.main_image_url|default:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=250&fit=crop' }}" 
+               class="card-img-top" style="height: 220px; object-fit: cover;">
+          
+          <!-- Status Badge -->
+          <div class="position-absolute top-2 start-2">
+            <span class="badge bg-{% if property.workflow_status == 'pending' %}warning text-dark{% elif property.workflow_status == 'approved' %}success{% elif property.workflow_status == 'available' %}info{% else %}secondary{% endif %} fs-6 px-3 py-2">
+              {{ property.workflow_status|title }}
+            </span>
+          </div>
+          
+          {% if property.is_featured %}
+          <div class="position-absolute top-2 end-2">
+            <span class="badge bg-danger text-white fs-6 px-3 py-2">⭐ Featured</span>
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="card-body d-flex flex-column p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5 class="card-title mb-2 fw-bold flex-grow-1">{{ property.title|truncatechars:40 }}</h5>
+            <span class="h5 text-primary fw-bold mb-0">
+              KSh {{ property.price|floatformat:0|intcomma }}
+              {% if property.listing_status == 'rent' %}/mo{% endif %}
+            </span>
+          </div>
+          
+          <p class="text-muted small mb-3 flex-grow-1">{{ property.location }}</p>
+          
+          <!-- Quick Stats -->
+          <div class="row text-center small mb-4">
+            <div class="col-4">
+              <i class="fas fa-bed text-muted mb-1 d-block"></i>
+              <strong>{{ property.bedrooms }}</strong>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-bath text-muted mb-1 d-block"></i>
+              <strong>{{ property.bathrooms }}</strong>
+            </div>
+            <div class="col-4">
+              <i class="fas fa-eye text-muted mb-1 d-block"></i>
+              <strong>{{ property.views_count|default:0 }}</strong>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="d-grid gap-2 mt-auto">
+            <a href="{% url 'properties:detail' property.slug %}" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-eye me-1"></i>Preview
+            </a>
+            <a href="{% url 'properties:edit' property.pk %}" class="btn btn-outline-warning btn-sm">
+              <i class="fas fa-edit me-1"></i>Edit
+            </a>
+            <a href="{% url 'properties:delete' property.pk %}" class="btn btn-outline-danger btn-sm">
+              <i class="fas fa-trash me-1"></i>Delete
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if properties.has_other_pages %}
+  <nav class="mt-5">
+    <ul class="pagination justify-content-center">
+      {% if properties.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1">&laquo; First</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ properties.previous_page_number }}">Previous</a>
+        </li>
+      {% endif %}
+      
+      <li class="page-item active">
+        <span class="page-link">{{ properties.number }} of {{ properties.paginator.num_pages }}</span>
+      </li>
+      
+      {% if properties.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ properties.next_page_number }}">Next</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ properties.paginator.num_pages }}">Last &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="text-center py-8">
+    <i class="fas fa-home fa-5x text-muted mb-4 opacity-50"></i>
+    <h3 class="text-muted mb-3">No properties listed yet</h3>
+    <p class="text-muted mb-5">Start by adding your first property to earn commissions!</p>
+    <a href="{% url 'properties:create' %}" class="btn btn-primary btn-lg">
+      <i class="fas fa-plus me-2"></i>List Your First Property
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

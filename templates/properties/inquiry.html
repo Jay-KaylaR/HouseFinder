@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-5 text-center">
+          <!-- Warning Icon -->
+          <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4 p-4" style="width: 100px; height: 100px;">
+            <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
+          </div>
+          
+          <h2 class="h3 fw-bold text-danger mb-3">Delete Property?</h2>
+          <p class="lead text-muted mb-4">
+            This action <strong>cannot be undone</strong>. Property "<strong>{{ property.title }}</strong>" 
+            and all its images/inquiries will be permanently deleted.
+          </p>
+          
+          <!-- Property Preview -->
+          <div class="row g-3 mb-5 p-4 bg-light rounded-3">
+            <div class="col-md-3 text-center">
+              <img src="{{ property.main_image_url|default:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200&h=150&fit=crop' }}" 
+                   class="rounded-2 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+            </div>
+            <div class="col-md-9">
+              <h5 class="mb-1">{{ property.title }}</h5>
+              <div class="d-flex align-items-center gap-3 mb-2 small">
+                <span class="badge bg-secondary">{{ property.location|truncatechars:20 }}</span>
+                <span class="badge bg-info">{{ property.bedrooms }}BR</span>
+                <span class="badge bg-primary">KSh {{ property.price|floatformat:0|intcomma }}/mo</span>
+              </div>
+              <small class="text-muted">
+                Created: {{ property.created_at|date:"M d, Y" }} • 
+                {{ property.views_count }} views
+              </small>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <form method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-lg px-5" 
+                      onclick="return confirm('Are you absolutely sure? This cannot be undone.')">
+                <i class="fas fa-trash me-2"></i>Yes, Delete Permanently
+              </button>
+            </form>
+            <a href="{% url 'properties:my_properties' %}" class="btn btn-outline-secondary btn-lg px-5">
+              <i class="fas fa-times me-2"></i>Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

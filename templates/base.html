@@ -1,176 +1,219 @@
-<!-- global html config file : JINJA TEMPLATING -->
+{% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}HouseFinder Mombasa{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .content {
-            flex: 1;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .user-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        .renter-badge {
-            background-color: #0dcaf0;
-            color: #000;
-        }
-        .manager-badge {
-            background-color: #198754;
-            color: #fff;
-        }
-        .admin-badge {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-    </style>
-    {% block extra_css %}{% endblock %}
+  <meta charset="utf-8">
+  <title>{% block title %}HouseHunting Solutions{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Main styles -->
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f3f4f6;
+    }
+    main {
+      flex: 1 0 auto;
+    }
+    .navbar-brand span {
+      font-weight: 800;
+      letter-spacing: .03em;
+      padding:30px;
+    }
+    .bg-gradient-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border: none;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+    .shadow-soft {
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    }
+    .hover-raise {
+      transition: all 0.2s ease;
+    }
+    .hover-raise:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.18);
+    }
+    .footer {
+      background: #0f172a;
+      color: #9ca3af;
+    }
+    .footer a {
+      color: #e5e7eb;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #ffffff;
+    }
+    .badge-soft {
+      background-color: rgba(15, 23, 42, .06);
+      color: #111827;
+    }
+    .header{
+      padding: 15px;
+      font-size: 48pt;
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'main:home' %}">
-                <i class="fas fa-home me-2"></i> HouseFinder Mombasa
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-soft">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'main:home' %}">
+      <i class="fas fa-house-chimney me-2"></i>
+      <span>House Hunting Solutions</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+        <!-- Browse properties -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'properties:listings' %}">
+            <i class="fas fa-building me-1"></i>Browse Properties
+          </a>
+        </li>
+
+        <!-- Conditional dashboards -->
+        {% if request.user.is_authenticated %}
+          {% if request.user_type == 'manager' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:manage_dashboard' %}">
+                <i class="fas fa-gauge-high me-1"></i>Manager Dashboard
+              </a>
+            </li>
+          {% elif request.user_type == 'renter' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:renter_dashboard' %}">
+                <i class="fas fa-gauge me-1"></i>Renter Dashboard
+              </a>
+            </li>
+          {% elif request.user.is_superuser %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:admin_dashboard' %}">
+                <i class="fas fa-gauge-simple-high me-1"></i>Admin Dashboard
+              </a>
+            </li>
+          {% endif %}
+        {% endif %}
+
+        <!-- Auth links -->
+        {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-2" style="width:32px;height:32px;">
+                <span class="small fw-bold">
+                  {{ request.user.first_name|default:request.user.username|first|upper }}
+                </span>
+              </div>
+              <span>{{ request.user.username }}</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'main:listings' %}">
-                            <i class="fas fa-search me-1"></i> Properties
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'main:guides' %}">
-                            <i class="fas fa-book me-1"></i> Guides
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'main:lifestyle' %}">
-                            <i class="fas fa-heart me-1"></i> Lifestyle
-                        </a>
-                    </li>
-                    {% if user.is_authenticated and user.is_manager %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'properties:create' %}">
-                            <i class="fas fa-plus-circle me-1"></i> Add Property
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i> {{ user.username }}
-                                {% if user.user_type %}
-                                <span class="user-badge {% if user.user_type == 'renter' %}renter-badge{% elif user.user_type == 'manager' %}manager-badge{% else %}admin-badge{% endif %}">
-                                    {{ user.get_user_type_display }}
-                                </span>
-                                {% endif %}
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                    <i class="fas fa-user-circle me-2"></i> Profile
-                                </a></li>
-                                {% if user.is_manager %}
-                                <li><a class="dropdown-item" href="{% url 'manage:dashboard' %}">
-                                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                                </a></li>
-                                {% endif %}
-                                {% if user.is_staff %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
-                                        <i class="fas fa-cogs me-2"></i> Admin Panel
-                                    </a></li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                </a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:login' %}">
-                                <i class="fas fa-sign-in-alt me-1"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-outline-light ms-2" href="{% url 'accounts:register' %}">
-                                <i class="fas fa-user-plus me-1"></i> Register
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="content">
-        <div class="container mt-4">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            <!-- HTML rendering as I move page to page -->
-            {% block content %}{% endblock %}  
-        </div>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="dropdown-item-text small text-muted">
+                <span class="badge bg-secondary me-1">{{ request.user.type|default:"User"|title }}</span>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-right-from-bracket me-2"></i>Logout</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-outline-light btn-sm me-2" href="{% url 'accounts:login' %}">Login</a>
+            <a class="btn btn-warning btn-sm" href="{% url 'accounts:register' %}">
+              <i class="fas fa-user-plus me-1"></i>Sign up
+            </a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
+  </div>
+</nav>
 
-    <footer class="bg-dark text-light py-4 mt-5 border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h6><i class="fas fa-home me-2"></i>HouseFinder Mombasa</h6>
-                    <p class="mb-1">&copy; 2025 All rights reserved.</p>
-                    <p class="mb-0">
-                        <a href="mailto:support@housefindermombasa.co.ke" class="text-light">
-                            <i class="fas fa-envelope me-1"></i>support@housefindermombasa.co.ke
-                        </a> | 
-                        <a href="tel:+254712345678" class="text-light">
-                            <i class="fas fa-phone me-1"></i>+254 712 345 678
-                        </a>
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-light me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
-                    <a href="#" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
-                    <a href="#" class="text-light"><i class="fab fa-linkedin-in fa-lg"></i></a>
-                </div>
-            </div>
+<!-- FLASH MESSAGES -->
+<div class="container mt-3">
+  {% if messages %}
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="py-4">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer mt-auto pt-5 pb-4">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="text-white mb-3">House Hunting Solutions</h5>
+        <p class="small mb-3">
+          A smarter way to connect renters, buyers, and trusted property managers across the Coast.
+        </p>
+        <div class="d-flex gap-3">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-x-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
         </div>
-    </footer>
+      </div>
+      <div class="col-md-4">
+        <h6 class="text-white mb-3">Explore More From HouseHunting Solutions</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'properties:listings' %}">All properties</a></li>
+          <li><a href="{% url 'main:home' %}#featured">Featured homes</a></li>
+          <li><a href="{% url 'accounts:register' %}">Create an account</a></li>
+          <li><a href="{% url 'accounts:login' %}">Sign in</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="text-white mb-3">Contact</h6>
+        <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i>Mombasa, Kenya</p>
+        <p class="small mb-1"><i class="fas fa-envelope me-2"></i>support@househuntingsolutions.co.ke</p>
+        <p class="small mb-3"><i class="fas fa-phone me-2"></i>+254 700 000 000</p>
+      </div>
+    </div>
+    <hr class="border-secondary border-opacity-25 my-3">
+    <div class="d-flex justify-content-between align-items-center small">
+      <span>© {{ now|date:"Y" }} QuantumCreations. All rights reserved.</span>
+      <span>Built with Django & Bootstrap 5</span>
+    </div>
+  </div>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
-    {% block extra_js %}{% endblock %}
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+{% block extra_css %}{% endblock %}
 </body>
 </html>

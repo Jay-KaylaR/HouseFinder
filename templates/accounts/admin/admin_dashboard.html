@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard - HouseHunting Solutions{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-6" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); min-height: 100vh;">
+  <!-- Header -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="display-4 fw-bold text-white mb-2">Admin Dashboard</h1>
+          <p class="text-white-50 fs-5 mb-0">Platform management & oversight</p>
+        </div>
+        <a href="/admin/" class="btn btn-light btn-lg px-4 shadow-lg">
+          <i class="fas fa-cogs me-2"></i>Django System Admin
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="row g-4 mb-6">
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #f8fafc, #e2e8f0);">
+        <div class="card-body p-5 text-center">
+          <div class="bg-primary bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
+            <i class="fas fa-users fa-2x text-white"></i>
+          </div>
+          <h2 class="display-5 fw-bold text-dark mb-1">{{ total_users|default:0 }}</h2>
+          <p class="text-muted fs-6 mb-0">Total Users</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #fef3c7, #fde68a);">
+        <div class="card-body p-5 text-center">
+          <div class="bg-success bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
+            <i class="fas fa-home fa-2x text-white"></i>
+          </div>
+          <h2 class="display-5 fw-bold text-dark mb-1">{{ active_properties|default:0 }}</h2>
+          <p class="text-muted fs-6 mb-0">Active Properties</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #dcfce7, #bbf7d0);">
+        <div class="card-body p-5 text-center">
+          <div class="bg-warning bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
+            <i class="fas fa-chart-line fa-2x text-white"></i>
+          </div>
+          <h2 class="display-5 fw-bold text-dark mb-1">KSh {{ monthly_revenue|default:0|floatformat:0|intcomma }}</h2>
+          <p class="text-muted fs-6 mb-0">Monthly Revenue</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #fee2e2, #fecaca);">
+        <div class="card-body p-5 text-center">
+          <div class="bg-danger bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
+            <i class="fas fa-clock fa-2x text-white"></i>
+          </div>
+          <h2 class="display-5 fw-bold text-dark mb-1">{{ pending_properties|default:0 }}</h2>
+          <p class="text-muted fs-6 mb-0">Pending Properties</p>
+        </div>
+      </div>
+    </div>
+  </div><br>
+
+  <!-- Main Content Grid - MERGED PROPERTY APPROVALS -->
+  <div class="row g-5">
+    <!-- Pending Property Approvals (Main Section) -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-xl h-100">
+        <div class="card-header bg-white border-0 pb-0">
+          <h4 class="h4 fw-bold mb-0">
+            {% if pending_properties_list %}📋 {{ pending_properties }} Pending Properties{% else %}✅ No Pending Approvals{% endif %}
+          </h4>
+        </div>
+        <div class="card-body p-0">
+          {% if pending_properties_list %}
+            <div class="list-group list-group-flush">
+              {% for property in pending_properties_list %}
+              <div class="list-group-item px-4 py-4 border-bottom hover-shadow">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center flex-grow-1">
+                    <div class="bg-warning bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center me-3 p-2 border border-warning" style="width: 60px; height: 60px;">
+                      <i class="fas fa-clock text-warning fa-lg"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1 fw-semibold">{{ property.title|truncatechars:40 }}</h6>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-secondary">{{ property.manager.first_name }} {{ property.manager.last_name }}</span>
+                        <span class="badge bg-info">{{ property.location|truncatechars:15 }}</span>
+                      </div>
+                      <small class="text-muted">KSh {{ property.price|floatformat:0|intcomma }}/mo • {{ property.bedrooms }}BR</small>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <form method="post" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="property_id" value="{{ property.id }}">
+                      <button type="submit" name="action" value="approve" class="btn btn-success btn-sm px-3">
+                        <i class="fas fa-check me-1"></i>Approve
+                      </button>
+                    </form>
+                    <form method="post" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="property_id" value="{{ property.id }}">
+                      <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Reject {{ property.title }}?')">
+                        <i class="fas fa-times me-1"></i>Reject
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% if pending_properties > 8 %}
+            <div class="text-center py-3 border-top">
+              <a href="#" class="text-primary">View all {{ pending_properties }} pending properties →</a>
+            </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-8">
+              <i class="fas fa-check-circle fa-4x text-success mb-4 opacity-75"></i>
+              <h5 class="text-muted mb-3">No pending property approvals</h5>
+              <p class="text-muted mb-0">All submitted properties are approved</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Statistics (KEEP ORIGINAL) -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-xl h-100">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <h5 class="mb-0 fw-bold">Platform Overview</h5>
+        </div>
+        <div class="card-body py-4">
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">Property Managers</small></div>
+            <div class="col-4 text-end"><strong>{{ managers_count|default:0 }}</strong></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">House Seekers</small></div>
+            <div class="col-4 text-end"><strong>{{ renters_count|default:0 }}</strong></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">Total Properties</small></div>
+            <div class="col-4 text-end"><strong>{{ total_properties|default:0 }}</strong></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">Pending Properties</small></div>
+            <div class="col-4 text-end"><strong class="text-warning">{{ pending_properties|default:0 }}</strong></div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">Rented Properties</small></div>
+            <div class="col-4 text-end"><strong class="text-success">{{ rented_properties|default:0 }}</strong></div>
+          </div>
+          <hr class="my-3">
+          <div class="row g-3 mb-3">
+            <div class="col-8"><small class="text-muted">Total Commission</small></div>
+            <div class="col-4 text-end"><strong>KSh {{ total_commission|default:0|floatformat:0|intcomma }}</strong></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-8"><small class="text-muted">Pending Commission</small></div>
+            <div class="col-4 text-end"><strong class="text-warning">KSh {{ pending_commission|default:0|floatformat:0|intcomma }}</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity (KEEP ORIGINAL) -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-xl">
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0 fw-bold">Recent Activity</h5>
+        </div>
+        <div class="card-body py-4">
+          <div class="d-flex align-items-start mb-4 p-3 border-start border-3 border-primary">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3"><i class="fas fa-user-plus text-primary"></i></div>
+            <div>
+              <p class="mb-1 fw-semibold">New property manager registered</p>
+              <small class="text-muted">John Mwangi • 15 minutes ago</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-start mb-4 p-3 border-start border-3 border-success">
+            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3"><i class="fas fa-home text-success"></i></div>
+            <div>
+              <p class="mb-1 fw-semibold">New property listing approved</p>
+              <small class="text-muted">3BR Nyali Beach House • 1 hour ago</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-start p-3 border-start border-3 border-warning">
+            <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3"><i class="fas fa-dollar-sign text-warning"></i></div>
+            <div>
+              <p class="mb-1 fw-semibold">Commission payment processed</p>
+              <small class="text-muted">KSh 45,000 • 3 hours ago</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.hover-shadow:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important; }
+.bg-gradient-primary { background: linear-gradient(135deg, #3b82f6, #1e40af) !important; }
+.border-start { border-left-width: 4px !important; }
+</style>
+{% endblock %}

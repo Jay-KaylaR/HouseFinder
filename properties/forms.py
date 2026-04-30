@@ -6,7 +6,7 @@ class PropertyForm(forms.ModelForm):
     class Meta:
         model = Property
         fields = [
-            'title', 'description', 'price', 'status', 'category', 
+            'title', 'description', 'price', 'listing_status', 'workflow_status', 'category', 
             'location', 'lat', 'lng', 'bedrooms', 'bathrooms', 'cover_image'
         ]
         widgets = {
@@ -25,7 +25,10 @@ class PropertyForm(forms.ModelForm):
                 'min': '0',
                 'step': '100'
             }),
-            'status': forms.Select(attrs={
+            'listing_status': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'workflow_status': forms.Select(attrs={
                 'class': 'form-control'
             }),
             'category': forms.Select(attrs={
@@ -64,7 +67,8 @@ class PropertyForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Customize labels
         self.fields['price'].label = 'Price (KSh)'
-        self.fields['status'].label = 'Availability'
+        self.fields['listing_status'].label = 'Listing Type'
+        self.fields['workflow_status'].label = 'Availability'
         self.fields['bedrooms'].label = 'Bedrooms'
         self.fields['bathrooms'].label = 'Bathrooms'
         self.fields['cover_image'].label = 'Cover Image (Optional)'

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - HouseHunting Solutions{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                    <h2 class="fw-bold">Create Account</h2>
+                    <p class="text-muted">Join House Hunting Solutions  today</p>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Row 1: Username & Email -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Row 2: User Type (Key Field) -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.user_type.id_for_label }}" class="form-label fw-bold">User Type <i class="fas fa-info-circle text-info"></i></label>
+                            {{ form.user_type }}
+                            {% if form.user_type.errors %}
+                                <div class="text-danger small">{{ form.user_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div id="admin-fields" style="display: none; margin-top: 2rem;">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <strong>Admin/Manager:</strong> Your account will be <strong>PENDING</strong> admin approval.
+                                    Upload ID & KRA for verification.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 3: Admin/Manager EXTRA Fields (Hidden by default) -->
+                    <div id="extra-fields" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.kra_pin.id_for_label }}" class="form-label fw-bold">KRA PIN</label>
+                                {{ form.kra_pin }}
+                                {% if form.kra_pin.errors %}
+                                    <div class="text-danger small">{{ form.kra_pin.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.national_id.id_for_label }}" class="form-label fw-bold">National ID</label>
+                                {{ form.national_id }}
+                                {% if form.national_id.errors %}
+                                    <div class="text-danger small">{{ form.national_id.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- ID Card Upload -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">ID Card Upload <span class="text-danger">*</span></label>
+                            <input type="file" name="id_card_file" class="form-control" accept="image/*,.pdf" required>
+                            <div class="form-text">PDF, JPG, PNG (Max 5MB) - Required for Admin/Manager</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Passwords -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Non-field errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                                                       
+                    
+                    
+                    <!-- <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.user_type.label_tag }}
+                            {{ form.user_type }}
+                            {% if form.user_type.errors %}
+                                <div class="text-danger small">{{ form.user_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div> -->
+
+                   <button type="submit" class="btn btn-success w-100 py-3 fw-bold fs-5">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p>Already have an account? <a href="{% url 'accounts:login' %}" class="text-primary fw-bold">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ✅ JavaScript for Dynamic Fields -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeField = document.getElementById('{{ form.user_type.id_for_label }}');
+    const extraFields = document.getElementById('extra-fields');
+    const adminFields = document.getElementById('admin-fields');
+    
+    function toggleExtraFields() {
+        if (userTypeField.value === 'admin' || userTypeField.value === 'manager') {
+            extraFields.style.display = 'block';
+            adminFields.style.display = 'block';
+        } else {
+            extraFields.style.display = 'none';
+            adminFields.style.display = 'none';
+        }
+    }
+    
+    // Initial check
+    toggleExtraFields();
+    
+    // Listen for changes
+    userTypeField.addEventListener('change', toggleExtraFields);
+});
+</script>
+
+{% endblock %}
+

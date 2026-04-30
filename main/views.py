@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from properties.models import Property
 
 def home_view(request):
@@ -6,8 +6,8 @@ def home_view(request):
     return render(request, 'home.html', {'featured_properties': featured_properties})
 
 def listings_view(request):
-    # This can redirect to properties app or render its own template
-    return render(request, 'listings.html')
+    # Redirect to properties app listings to keep filtering behavior consistent
+    return redirect('properties:listings')
 
 def guides_view(request):
     return render(request, 'guides.html')

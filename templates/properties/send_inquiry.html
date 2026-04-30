@@ -1,0 +1,79 @@
+<!-- {% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Edit {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <h1 class="h2 fw-bold mb-2">Edit Property</h1>
+          <p class="text-muted mb-0">Update "{{ property.title }}" details</p>
+        </div>
+        <a href="{% url 'properties:my_properties' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Back to My Properties
+        </a>
+      </div>
+
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-5">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+              <!-- Property Preview --> 
+            <!--
+            <div class="row mb-5 p-4 bg-light rounded-3">
+              <div class="col-md-3 text-center">
+                <img src="{{ property.main_image_url|default:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200&h=150&fit=crop' }}" 
+                     class="rounded-3 shadow-sm mb-3" style="width: 180px; height: 180px; object-fit: cover;">
+                <small class="text-muted">Current image</small>
+              </div>
+              <div class="col-md-9">
+                <h4 class="mb-2">{{ property.title }}</h4>
+                <div class="mb-2">
+                  <span class="badge bg-info fs-6 px-3 py-2">{{ property.location }}</span>
+                  <span class="badge bg-secondary fs-6 px-3 py-2">{{ property.workflow_status|title }}</span>
+                </div>
+                <div class="h5 text-primary">KSh {{ property.price|floatformat:0|intcomma }}/mo</div>
+              </div>
+            </div>
+
+            <!-- Form Fields (Your PropertyForm will render here) -->
+            <div class="row g-4 mb-5">
+              <div class="col-md-6">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+              </div>
+              <div class="col-md-6">
+                {{ form.price.label_tag }}
+                {{ form.price }}
+              </div>
+              <div class="col-md-6">
+                {{ form.location.label_tag }}
+                {{ form.location }}
+              </div>
+              <div class="col-md-6">
+                {{ form.category.label_tag }}
+                {{ form.category }}
+              </div>
+              <!-- Add other form fields here -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3 justify-content-end flex-wrap">
+              <a href="{% url 'properties:my_properties' %}" class="btn btn-outline-secondary btn-lg px-5">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-save me-2"></i>Update Property
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} -->

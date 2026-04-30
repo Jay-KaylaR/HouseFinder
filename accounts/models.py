@@ -15,10 +15,29 @@ class User(AbstractUser):
     )
     
     # table columns 
+
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='renter')
     profile_image = CloudinaryField('profile_images/', null=True, blank=True)
     bio = models.TextField(max_length=500, blank=True, null=True)
+   
+    kra_pin = models.CharField(max_length=20, blank=True, null=True)
+    national_id = models.CharField(max_length=20, blank=True, null=True)
+    id_card_file = models.FileField(upload_to='id_cards/', blank=True, null=True)
+    approval_status = models.CharField(
+        max_length=20, 
+        choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')],
+        default='pending'
+    )
+    is_verified = models.BooleanField(default=False)
     
+    def save(self, *args, **kwargs):
+        if self.user_type == 'regular':
+            self.kra_pin = ''
+            self.national_id = ''
+            self.approval_status = 'approved'
+            self.is_verified = True
+        super().save(*args, **kwargs)
+
     # Mombasa-specific fields (kept for functionality)
     phone = models.CharField(max_length=15, blank=True)
     national_id = CloudinaryField('national_ids/', blank=True)

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Browse Properties - HouseFinder Mombasa{% endblock %}
+{% block title %}Browse Properties - HouseHunting Solutions{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -75,7 +75,6 @@
                 </a>
             {% endif %}
         </div>
-
         <div class="row">
             {% if properties %}
                 {% for property in properties %}
@@ -102,6 +101,24 @@
                                class="btn btn-sm btn-outline-primary">
                                 View
                             </a>
+                            
+                            <form method="post" action="{% url 'properties:toggle_save' property.id %}" class="d-inline"> 
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-warning btn-sm" 
+                            title="{% if property in saved_properties %}Remove from Saved{% else %}Save Property{% endif %}">
+                            <i class="fas {% if property in saved_properties %}fa-heart text-danger{% else %}fa-heart-o{% endif %}"></i>
+                            <span class="d-none d-md-inline ms-1">
+                                {% if property in saved_properties %}Saved{% else %}Save{% endif %}
+                            </span>
+                            </button>
+                            </form> 
+                            <form method="post" action="{% url 'properties:contact_manager' property.id %}" class="d-inline"> 
+                            {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm" title="Contact Manager">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    <span class="d-none d-md-inline">Contact</span>
+                                </button>
+                            </form> 
                         </div>
                     </div>
                 </div>

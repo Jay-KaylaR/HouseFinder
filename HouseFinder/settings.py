@@ -28,7 +28,17 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-=+dp8qhgcqthd0m#_#rpk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+]
+
+# Helpful for development when using runserver with explicit host/port
+# Add the local origins so CSRF checks that verify the Origin header succeed
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -38,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "cloudinary_storage",
     "accounts",
     "main",
@@ -83,8 +94,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "HouseFinder.urls"
-
 TEMPLATES = [
+
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / 'templates'], # modification will be here i.e. register our global templates folder 

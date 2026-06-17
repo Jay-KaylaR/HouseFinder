@@ -26,6 +26,7 @@ urlpatterns = [
     path("", include('main.urls')),
     path("properties/", include('properties.urls')),
     path("managerial/", include('managerial.urls')),
+    path('messaging/', include('messaging.urls')),
     
 ]
 

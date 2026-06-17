@@ -62,35 +62,32 @@
     <div class="col-lg-4">
         <div class="card mb-3 shadow-sm border-0">
             <div class="card-header bg-light">
-                <h6 class="mb-0">Contact Manager</h6>
+                <h6 class="mb-0">Actions</h6>
             </div>
             <div class="card-body">
-                {% if can_contact %}
-                    <form method="post" action="{% url 'properties:inquiry' property.pk %}">
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url 'properties:toggle_save' property.pk %}" class="d-inline">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Message</label>
-                            <textarea name="message"
-                                      rows="4"
-                                      class="form-control"
-                                      placeholder="Introduce yourself and share your preferred move-in date."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-paper-plane me-1"></i>Send Inquiry
+                        <button type="submit" class="btn btn-outline-warning me-2">
+                            <i class="fas fa-heart me-1"></i>
+                        
+                            {% if is_saved %}
+                                Remove from Saved
+                            {% else %}
+                                Save Property
+                            {% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'properties:contact_manager' property.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-envelope me-1"></i>Contact Manager
                         </button>
                     </form>
                 {% else %}
-                    <p class="text-muted">
-                        Login or create an account to message this manager.
-                    </p>
-                    <a href="{% url 'accounts:login' %}?next={{ request.path }}"
-                       class="btn btn-primary w-100 mb-2">
-                        Login
-                    </a>
-                    <a href="{% url 'accounts:register' %}"
-                       class="btn btn-outline-secondary w-100">
-                        Register
-                    </a>
+                    <p class="text-muted mb-2">Login to save this property or contact the manager.</p>
+                    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary me-2">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -123,20 +120,26 @@
 
 {% block extra_js %}
 {% if property.lat and property.lng %}
+{% if google_maps_api_key %}
 <script>
     function initMap() {
-        var loc = {lat: {{ property.lat }}, lng: {{ property.lng }} };
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 14,
-            center: loc
-        });
-        new google.maps.Marker({position: loc, map: map});
-    }
+    var loc = {lat: parseFloat("{{ property.lat }}"), lng: parseFloat("{{ property.lng }}")};
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: loc
+    });
+    new google.maps.Marker({position: loc, map: map});
+}
+
+window.gm_authFailure = function() {
+    console.error('Google Maps API authentication failed');
+    document.getElementById('map').innerHTML = '<p style="color: red;">Map failed to load. Check your API key.</p>';
+};
+
 </script>
-{% if google_maps_api_key %}
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"></script>
 {% else %}
-<!-- Google Maps not loaded: set GOOGLE_MAPS_API_KEY in your environment or settings.py -->
+<!-- Google Maps not loaded: -->
 {% endif %}
 {% endif %}
 {% endblock %}

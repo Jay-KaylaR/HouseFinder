@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Properties - HouseHunting Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-white border-0">
+      <h4 class="mb-0 fw-bold">All Properties</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>No:</th>
+              <th>Title</th>
+              <th>Location</th>
+              <th>Price</th>
+              <th>Bedrooms</th>
+              <th>Status</th>
+              <th>Manager</th>
+              <th>Modify</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            {% for property in properties %}
+            <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ property.title }}</td>
+            <td>{{ property.location }}</td>
+            <td>KSh {{ property.price|floatformat:0 }}</td>
+            <td>{{ property.bedrooms|floatformat:0 }}</td>
+            <td>
+                {% if property.is_available %}
+                <span class="badge bg-success">Active</span>
+                {% else %}
+                <span class="badge bg-secondary">Inactive</span>
+                {% endif %}
+            </td>
+            <td>{{ property.propertymanager}}</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                <form method="post" action="#" class="d-inline">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-warning">Deactivate</button>
+                </form>
+                <form method="post" action="#" class="d-inline">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this property?')">Delete</button>
+                </form>
+            </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

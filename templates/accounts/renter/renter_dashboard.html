@@ -7,7 +7,7 @@
 <div class="container py-5">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="fw-bold h3">House Seeker Dashboard</h1>
+    <h1 class="fw-bold h3">House Seeker  Dashboard</h1>
     <p class="text-muted mb-0">
       Welcome back, {{ request.user.first_name }} {{ request.user.last_name }}
     </p>
@@ -92,7 +92,8 @@
         </div>
         <div class="card-body">
           {% if saved_properties %}
-            {% for prop in saved_properties|slice:":3" %}
+            <div class="saved-list">
+            {% for prop in saved_properties %}
               <div class="d-flex align-items-center mb-3 p-2 rounded-3 border hover-shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=160&h=110&q=80"
@@ -113,19 +114,16 @@
                 </div>
                 <div class="ms-2 d-flex flex-column gap-2">
                   <a href="{% url 'properties:detail' prop.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
-                  <form method="post" action="{% url 'accounts:remove_saved' prop.pk %}">
+                  <form method="post" action="{% url 'properties:toggle_save' prop.pk %}">
                     {% csrf_token %}
                     <button class="btn btn-sm btn-link text-danger">Remove</button>
                   </form>
                 </div>
               </div>
             {% endfor %}
-            {% if saved_properties|length > 3 %}
-              <p class="text-muted small mt-3">
-                and {{ saved_properties|length|add:"-3" }} more saved homes…
-              </p>
-            {% endif %}
+            </div>
           {% else %}
+            
             <div class="text-center py-4">
               <i class="fas fa-heart fa-2x text-muted mb-3"></i>
               <p class="text-muted mb-2">You have not saved any homes yet.</p>
@@ -221,5 +219,12 @@
 <style>
   .hover-shadow-sm:hover { box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08); }
   .hover-bg-light:hover { background-color: #f8f9fa; }
+  .saved-list {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .saved-list::-webkit-scrollbar { width: 10px; }
+  .saved-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
 </style>
 {% endblock %}

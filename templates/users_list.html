@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Users - HouseHunting Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-white border-0">
+      <h4 class="mb-0 fw-bold">All Users</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>No:</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Date Joined</th>
+              <th>Modify</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ user.get_full_name|default:"—" }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email|default:"—" }}</td>
+              <td>
+                {% if user.is_active %}
+                  <span class="badge bg-success">Active</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ user.date|default:"—" }}</td>
+              <td>
+                <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                <form method="post" action="#" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-warning">Deactivate</button>
+                </form>
+                <form method="post" action="#" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

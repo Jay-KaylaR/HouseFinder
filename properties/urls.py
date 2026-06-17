@@ -14,5 +14,6 @@ urlpatterns = [
     path('<int:pk>/inquiry/', views.send_inquiry_view, name='inquiry'),
     path('save/<int:property_id>/', views.toggle_save, name='toggle_save'), 
     path('contact/<int:property_id>/', views.contact_manager, name='contact_manager'),
+    path('<int:pk>/status/', views.update_status, name='update_status'),
 ]
 

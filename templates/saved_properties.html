@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}My Favorites - House Hunting Solutions {% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold"><i class="fas fa-heart text-danger me-2"></i>Saved Properties</h2>
+            <p class="text-muted">You have {{ saved_properties|length }} properties in your favorites list.</p>
+        </div>
+        <a href="{% url 'main:home' %}" class="btn btn-outline-primary">Browse More</a>
+    </div>
+
+    {% if saved_properties %}
+        <div class="row g-4">
+            {% for item in saved_properties %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 hover-shadow">
+                        <!-- Property Image -->
+                        <div class="position-relative">
+                            {% if item.property.main_image %}
+                                <img src="{{ item.property.main_image.url }}" class="card-img-top" 
+                                     alt="{{ item.property.title }}" style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                    <i class="fas fa-home fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Remove Favorite Button -->
+                            <form method="POST" action="{% url 'properties:unsave_property' item.property.id %}" class="position-absolute top-0 end-0 m-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm rounded-circle" title="Remove from favorites">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate">{{ item.property.title }}</h5>
+                            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i>{{ item.property.location }}</p>
+                            <h4 class="text-primary fw-bold mb-3">KSh {{ item.property.price|intcomma }} <small class="text-muted fs-6">/ month</small></h4>
+                            
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span><i class="fas fa-bed me-1"></i>{{ item.property.bedrooms }} Beds</span>
+                                <span><i class="fas fa-bath me-1"></i>{{ item.property.bathrooms }} Baths</span>
+                                <span><i class="fas fa-ruler-combined me-1"></i>{{ item.property.sqft }} sqft</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a href="{% url 'properties:detail' item.property.slug %}" class="btn btn-primary w-100 fw-bold">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <i class="fas fa-heart fa-4x text-light mb-3"></i>
+            <h3>No favorites yet</h3>
+            <p class="text-muted">Start exploring and save properties you love.</p>
+            <a href="{% url 'main:home' %}" class="btn btn-primary mt-2">Explore Properties</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.hover-shadow:hover { box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important; transition: 0.3s; }
+</style>
+{% endblock %}

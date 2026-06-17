@@ -11,10 +11,13 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
 import os
 import cloudinary
 from dotenv import load_dotenv
+from decouple import config
+
+# Load environment variables from .env before using decouple
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +45,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
+    "cloudinary",
+    "cloudinary_storage",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,11 +54,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-    "cloudinary_storage",
     "accounts",
     "main",
     "properties",
     "managerial",
+    "messaging",
 ]
 
 # register our custom user model 
@@ -65,23 +70,40 @@ LOGIN_REDIRECT_URL = 'main:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Cloudinary configuration
-CLOUDINARY_CONFIGS = {
-    'cloud_name' : config('CLOUDINARY_CLOUD_NAME', default=''),
-    'api_key' : config('CLOUDINARY_API_KEY', default=''),
-    'api_secret' : config('CLOUDINARY_API_SECRET', default=''),
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
 }
-if CLOUDINARY_CONFIGS['cloud_name']:
-    cloudinary.config(**CLOUDINARY_CONFIGS)
 
-load_dotenv()
+# For Django 4.2+ (Recommended)
+
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "cloudinary_storage.storage.StaticHashedCloudinaryStorage",
+#     },
+# }
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
+# if CLOUDINARY_STORAGE['CLOUD_NAME']:
+#     cloudinary.config(**CLOUDINARY_STORAGE)
+# elif CLOUDINARY_URL:
+#     cloudinary.config(cloudinary_url=CLOUDINARY_URL)
+
 # environment configs for emails sending 
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+EMAIL_BACKEND = config("EMAIL_BACKEND",
+default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,7 +120,7 @@ TEMPLATES = [
 
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'], # modification will be here i.e. register our global templates folder 
+        "DIRS": [BASE_DIR / 'templates'], 
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -114,7 +136,6 @@ TEMPLATES = [
 ## URL packaging for static files and media 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -151,7 +172,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Africa/Nairobi"  # Mombasa timezone
+TIME_ZONE = "Africa/Nairobi"  
 
 USE_I18N = True
 USE_TZ = True

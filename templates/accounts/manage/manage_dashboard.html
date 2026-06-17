@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <!-- Stats Cards - ENHANCED WITH STATUS COUNTS -->
+  <!-- Stats Cards - -->
   <div class="row g-4 mb-6">
     <!-- Active Listings -->
     <div class="col-lg-3 col-md-6">
@@ -115,11 +115,30 @@
                     <a href="{% url 'properties:detail' property.pk %}" class="btn btn-outline-primary btn-sm me-2">
                       <i class="fas fa-eye"></i> View
                     </a>
-                    {% if property.workflow_status == 'rejected' %}
+
+                    <a href="{% url 'properties:edit' property.pk %}" class="btn btn-outline-warning btn-sm me-2">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'properties:delete' property.pk %}" class="btn btn-outline-danger btn-sm me-2">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    <form method="post" action="{% url 'properties:update_status' property.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm d-inline w-auto">
+                            <option value="available" {% if property.status == 'available' %}selected{% endif %}>Available</option>
+                            <option value="rented" {% if property.status == 'rented' %}selected{% endif %}>Rented</option>
+                            <option value="unavailable" {% if property.status == 'unavailable' %}selected{% endif %}>Temporarily Unavailable</option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm ms-1">Update</button>
+                    </form>
+
+
+                    <!-- {% if property.workflow_status == 'rejected' %}
                     <a href="#" class="btn btn-outline-warning btn-sm">
                       <i class="fas fa-edit"></i> Edit
                     </a>
-                    {% endif %}
+                    {% endif %} -->
+                    
                   </div>
                 </div>
               </div>
@@ -154,7 +173,7 @@
           </div>
         </div>
       </div>
-
+      <br>
       <!-- Commission Tracking -->
       <div class="card border-0 shadow-xl mb-5">
         <div class="card-header bg-gradient-primary text-white border-0">

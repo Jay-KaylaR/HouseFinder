@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
-
+from cloudinary.models import CloudinaryField
 # Try Cloudinary, fall back to local ImageField
 try:
     from cloudinary_storage.fields import CloudinaryField  # Cloudinary integration

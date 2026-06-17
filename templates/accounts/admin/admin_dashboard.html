@@ -5,13 +5,14 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-6" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); min-height: 100vh;">
+  
   <!-- Header -->
   <div class="row mb-5">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 class="display-4 fw-bold text-white mb-2">Admin Dashboard</h1>
-          <p class="text-white-50 fs-5 mb-0">Platform management & oversight</p>
+          <p class="text-white-50 fs-5 mb-0">Platform Management & Oversight</p>
         </div>
         <a href="/admin/" class="btn btn-light btn-lg px-4 shadow-lg">
           <i class="fas fa-cogs me-2"></i>Django System Admin
@@ -21,8 +22,10 @@
   </div>
 
   <!-- Stats Grid -->
+  
   <div class="row g-4 mb-6">
     <div class="col-lg-3 col-md-6">
+      <a href="{% url 'accounts:users_list' %}" class="text-decoration-none">
       <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #f8fafc, #e2e8f0);">
         <div class="card-body p-5 text-center">
           <div class="bg-primary bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
@@ -31,11 +34,15 @@
           <h2 class="display-5 fw-bold text-dark mb-1">{{ total_users|default:0 }}</h2>
           <p class="text-muted fs-6 mb-0">Total Users</p>
         </div>
+       </a>
       </div>
     </div>
+ 
 
+    
     <div class="col-lg-3 col-md-6">
       <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #fef3c7, #fde68a);">
+        <a href="{% url 'accounts:properties_list' %}" class="text-decoration-none">
         <div class="card-body p-5 text-center">
           <div class="bg-success bg-gradient rounded-circle p-4 d-inline-block mb-4 shadow-lg" style="width: 80px; height: 80px;">
             <i class="fas fa-home fa-2x text-white"></i>
@@ -43,8 +50,10 @@
           <h2 class="display-5 fw-bold text-dark mb-1">{{ active_properties|default:0 }}</h2>
           <p class="text-muted fs-6 mb-0">Active Properties</p>
         </div>
+        </a>
       </div>
     </div>
+  
 
     <div class="col-lg-3 col-md-6">
       <div class="card border-0 shadow-lg h-100" style="background: linear-gradient(145deg, #dcfce7, #bbf7d0);">

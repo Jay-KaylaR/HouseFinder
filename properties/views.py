@@ -5,10 +5,10 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from .models import Property, PropertyImage, Inquiry, Category, SavedProperty  # ✅ Add SavedProperty model
+from .models import Property, PropertyImage, Inquiry, Category, SavedProperty  
 from .forms import PropertyForm
-# from django.http import Http404
-# from django.db import transaction
+from django.http import Http404, HttpResponseForbidden
+from django.db import transaction
 
 
 User = get_user_model()
@@ -65,9 +65,17 @@ def listings_view(request):
     page_number = request.GET.get('page')
     property_list = paginator.get_page(page_number)
     
+    # Get saved properties for current user
+    saved_properties = []
+    if request.user.is_authenticated:
+        saved_properties = Property.objects.filter(
+            id__in=SavedProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
+        )
+    
     return render(request, 'listings.html', {
         'properties': property_list,
-        'query': query
+        'query': query,
+        'saved_properties': saved_properties
     })
 
 @login_required
@@ -141,11 +149,22 @@ def property_detail_view(request, pk=None, slug=None):
     can_contact = request.user.is_authenticated
     images = property.images.all()
 
+    # Get saved properties for current user and whether this property is saved
+    is_saved = False
+    saved_properties = []
+    if request.user.is_authenticated:
+        saved_properties = Property.objects.filter(
+            id__in=SavedProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
+        )
+        is_saved = SavedProperty.objects.filter(user=request.user, property=property).exists()
+
     return render(request, 'properties/detail.html', {
         'property': property,
         'can_contact': can_contact,
         'images': images,
         'google_maps_api_key': getattr(settings, 'GOOGLE_MAPS_API_KEY', ''),
+        'saved_properties': saved_properties,
+        'is_saved': is_saved,
     })
 
 @login_required
@@ -243,9 +262,28 @@ def contact_manager(request, property_id):
 
 
 
-    ontext = {
+    Context = {
         'properties': properties,
         # ✅ Pass saved properties for current user
         'saved_properties': request.user.saved_properties.all() if request.user.is_authenticated else []
     }
     return render(request, 'properties/property_list.html', context)
+
+
+@login_required
+def update_status(request, pk):
+    property = get_object_or_404(Property, pk=pk)
+
+    if request.method == 'POST':
+        if property.manager != request.user:
+            return HttpResponseForbidden()
+
+        status = request.POST.get('status')
+        if status in ['available', 'rented', 'unavailable']:
+            property.status = status
+            property.save()
+            messages.success(request, 'Property status updated.')
+        else:
+            messages.error(request, 'Invalid status selected.')
+
+    return redirect('accounts:manage_dashboard')
